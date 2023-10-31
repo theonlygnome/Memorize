@@ -42,12 +42,19 @@ class ThemeStore: ObservableObject, Identifiable {
         }
     }
     
+    
+    static var builtins: [Theme] { [
+        Theme(name: "Halloween", emojis: halloweenEmojis, numberOfPairs: 11, color: RGBA.init(color: Color.orange)),
+        Theme(name: "Vehicles", emojis: vehicleEmojis, numberOfPairs: 16, color: RGBA.init(color: Color.red)),
+        Theme(name: "Winter", emojis: winterEmojis, numberOfPairs: 12, color: RGBA.init(color: Color.blue))
+    ]}
+              
     init(named name: String) {
         self.name = name
         if themes.isEmpty {
-            themes = Theme.builtins
+            themes = ThemeStore.builtins
             if themes.isEmpty {
-                themes = [Theme(name: "Warning", emojis: ["⚠️"], numberOfPairs: 1, color: "Yellow")]
+                themes = [Theme(name: "Warning", emojis: ["⚠️"], numberOfPairs: 2, color: RGBA.init(color: Color.yellow))]
             }
         }
     }
@@ -84,7 +91,7 @@ class ThemeStore: ObservableObject, Identifiable {
         }
     }
     
-    func insert(name: String, emojis: [String], numberofPairs: Int, color: String, at index: Int? = nil) {
+    func insert(name: String, emojis: [String], numberofPairs: Int, color: RGBA, at index: Int? = nil) {
         insert(Theme(name: name, emojis: emojis, numberOfPairs: numberofPairs, color: color), at: index)
     }
     
@@ -101,7 +108,7 @@ class ThemeStore: ObservableObject, Identifiable {
         }
     }
     
-    func append(name: String, emojis: [String], numberOfPairs: Int, color: String) {
+    func append(name: String, emojis: [String], numberOfPairs: Int, color: RGBA) {
         append(Theme(name: name, emojis: emojis, numberOfPairs: numberOfPairs, color: color))
     }
 }
@@ -116,3 +123,26 @@ extension ThemeStore: Hashable {
     }
     
 }
+
+struct RGBA: Codable, Equatable, Hashable {
+    let red: Double
+    let green: Double
+    let blue: Double
+    let alpha: Double
+}
+
+extension Color {
+   init(rgba: RGBA) {
+      self.init(.sRGB, red: rgba.red, green: rgba.green, blue: rgba.blue, opacity: rgba.alpha)
+   }
+}
+
+extension RGBA {
+   init(color: Color) {
+      var red: CGFloat = 0
+      var green: CGFloat = 0
+      var blue: CGFloat = 0
+      var alpha: CGFloat = 0
+      UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+      self.init(red: Double(red), green: Double(green), blue: Double(blue), alpha: Double(alpha))
+} }

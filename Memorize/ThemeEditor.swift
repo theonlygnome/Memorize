@@ -13,10 +13,14 @@ struct ThemeEditor: View {
     private let emojiFont = Font.system(size: 40)
     
     @State private var emojisToAdd: String = ""
+    @State private var themeColor = Color.blue
+    @State private var stepperValue = 2
     
     enum Focused {
         case name
         case addEmojis
+        case colorPicker
+        case pairNumbers
     }
     
     @FocusState private var focused: Focused?
@@ -27,15 +31,14 @@ struct ThemeEditor: View {
                 TextField("Name", text: $theme.name)
                     .focused($focused, equals: .name)
             }
+            Section(header: Text("Color")) {
+                colorPicker
+            }
+            Section(header: Text("Number of Pairs")) {
+               stepper
+            }
             Section(header: Text("Emojis")) {
-                TextField("Add Emojis Here", text: $emojisToAdd)
-                    .focused($focused, equals: .addEmojis)
-                    .font(emojiFont)
-                    .onChange(of: emojisToAdd) {
-                        for emoji in emojisToAdd {
-                            theme.emojis.append(String(emoji))
-                        }
-                    }
+                addEmojis
                 removeEmojis
             }
         }
@@ -68,8 +71,37 @@ struct ThemeEditor: View {
          .font(emojiFont)
      }
     
+    var stepper: some View {
+        Stepper {
+                Text("Number of pairs: \(stepperValue)")
+                } onIncrement: {
+                    stepperValue += 1
+                    if stepperValue >= theme.emojis.count { stepperValue = theme.emojis.count }
+                    theme.numberOfPairs = stepperValue
+                } onDecrement: {
+                    stepperValue -= 1
+                    if stepperValue <= 2 { stepperValue = 2 }
+                    theme.numberOfPairs = stepperValue
+                }
+    }
+    
+    var colorPicker: some View {
+        ColorPicker("Theme Color", selection: $themeColor)
+            .onChange(of: themeColor) {
+                theme.color = RGBA(color: themeColor)
+            }
+    }
+    
+    var addEmojis: some View {
+        TextField("Add Emojis Here", text: $emojisToAdd)
+            .focused($focused, equals: .addEmojis)
+            .font(emojiFont)
+            .onChange(of: emojisToAdd) {
+                for emoji in emojisToAdd {
+                    if emoji.isEmoji && !theme.emojis.contains(String(emoji)) {
+                        theme.emojis.append(String(emoji))
+                    }
+                }
+            }
+    }
 }
-
-//#Preview {
-//    ThemePalette()
-//}

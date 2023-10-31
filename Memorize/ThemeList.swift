@@ -10,7 +10,8 @@ import SwiftUI
 struct EditableThemeList: View {
     @EnvironmentObject var store: ThemeStore
     @State private var showCursorTheme = false
-    @State var game = EmojiMemoryGame()
+    @State private var showTheme = false
+    
     var body: some View {
         NavigationStack {
             List {
@@ -22,11 +23,25 @@ struct EditableThemeList: View {
                             // Text("\(theme.numberOfPairs) pairs")
                             Text(theme.emojis.joined(separator: " ")).lineLimit(1)
                         }
-                    }
-                }
-                .onDelete { indexSet in
-                    withAnimation {
-                        store.themes.remove(atOffsets: indexSet)
+                        .swipeActions(edge: .trailing) {
+                            Button {
+                                showTheme = true
+                                if let index = store.themes.firstIndex(where: {$0.id == theme.id}) {
+                                    store.cursorIndex = index
+                                }
+                            }
+                            label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) {
+                                print("Deleting Theme")
+                                if let index = store.themes.firstIndex(where: {$0.id == theme.id}) {
+                                    store.themes.remove(at: index)
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
+                        }
                     }
                 }
                 .onMove { indexSet, newOffset in
@@ -34,19 +49,18 @@ struct EditableThemeList: View {
                     
                 }
             }
+            .navigationDestination(isPresented: $showTheme) {
+                ThemeEditor(theme: $store.themes[store.cursorIndex])
+            }
             .navigationDestination(for: Theme.self) { theme in
-                EmojiMemoryGameView(viewModel: game)
-                //ThemeView(theme: theme)
-                //if let index = store.themes.firstIndex(where: { $0.id == theme.id }) {
-                //    ThemeEditor(theme: $store.themes[index])
-                //}
+                EmojiMemoryGameView(viewModel: EmojiMemoryGame(theme: theme))
             }
             .navigationDestination(isPresented: $showCursorTheme) {
                 ThemeEditor(theme: $store.themes[store.cursorIndex])
             }            .navigationTitle("\(store.name) Themes")
             .toolbar {
                 Button {
-                    store.insert(Theme(name: "", emojis: [""], numberOfPairs: 2, color: ""))
+                    store.insert(Theme(name: "", emojis: [], numberOfPairs: 2, color: RGBA(color: Color.blue)))
                     showCursorTheme = true
                 } label: {
                     Image(systemName: "plus")

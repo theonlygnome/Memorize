@@ -130,5 +130,5 @@ struct EmojiMemoryGameView: View {
 }
 
 #Preview {
-    EmojiMemoryGameView(viewModel: EmojiMemoryGame())
+    EmojiMemoryGameView(viewModel: EmojiMemoryGame(theme: Theme(name: "", emojis: [], numberOfPairs: 2, color: RGBA(color: Color.blue))))
 }
