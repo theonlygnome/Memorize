@@ -40,7 +40,7 @@ class EmojiMemoryGame: ObservableObject {
         return model.cards
     }
     
-    func newGame(numberOfPairs: Int) {
+    func newGame() {
         model = createMemoryGame()
     }
     

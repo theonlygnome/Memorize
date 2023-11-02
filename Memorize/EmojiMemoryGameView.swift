@@ -19,39 +19,33 @@ struct EmojiMemoryGameView: View {
     private let dealAnimation: Animation = .spring(response: 0.5, dampingFraction: 0.825)
     private let dealInterval: TimeInterval = 0.15
     private let deckWidth: CGFloat = 50
-        
+    
     var body: some View {
-//        EditableThemeList()
-//            .sheet(isPresented: $showThemeEditor) {
-//                //ThemePalette(theme: )
-//            }
-//            .sheet(isPresented: $showGame) {
-                VStack {
-                    HStack {
-                        Text(viewModel.title())
-                            .font(.title)
-                            .foregroundStyle(viewModel.getForegroundColor())
-                        Spacer()
-                        score
-                    }
-                    cards
-                        .foregroundColor(viewModel.getForegroundColor())
-                    Spacer()
-                    Button(action: {
-                        viewModel.newGame(numberOfPairs: 11)
-                        withAnimation {
-                            viewModel.shuffle()
-                        }
-                    }, label: {
-                        Text("New Game")
-                            .font(.subheadline)
-                        Spacer()
-                        deck
-                            .foregroundColor(viewModel.getForegroundColor())
-                    })
+        VStack {
+            HStack {
+                Text(viewModel.title())
+                    .font(.title)
+                    .foregroundStyle(viewModel.getForegroundColor())
+                Spacer()
+                score
+            }
+            cards
+                .foregroundColor(viewModel.getForegroundColor())
+            Spacer()
+            Button(action: {
+                viewModel.newGame()
+                withAnimation {
+                    viewModel.shuffle()
                 }
-                .padding()
-  //          }
+            }, label: {
+                Text("New Game")
+                    .font(.subheadline)
+                Spacer()
+                deck
+                    .foregroundColor(viewModel.getForegroundColor())
+            })
+        }
+        .padding()
     }
     
     private var score: some View {
@@ -98,7 +92,7 @@ struct EmojiMemoryGameView: View {
         }
         .frame(width: deckWidth, height: deckWidth / aspectRatio )
         .onTapGesture {
-           deal()
+            deal()
         }
     }
     
@@ -106,7 +100,7 @@ struct EmojiMemoryGameView: View {
         var delay: TimeInterval = 0
         for card in viewModel.cards {
             withAnimation(dealAnimation.delay(delay)) {
-               _ = dealt.insert(card.id)
+                _ = dealt.insert(card.id)
             }
             delay += dealInterval
         }

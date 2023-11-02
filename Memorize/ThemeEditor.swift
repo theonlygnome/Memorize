@@ -72,17 +72,7 @@ struct ThemeEditor: View {
      }
     
     var stepper: some View {
-        Stepper {
-                Text("Number of pairs: \(stepperValue)")
-                } onIncrement: {
-                    stepperValue += 1
-                    if stepperValue >= theme.emojis.count { stepperValue = theme.emojis.count }
-                    theme.numberOfPairs = stepperValue
-                } onDecrement: {
-                    stepperValue -= 1
-                    if stepperValue <= 2 { stepperValue = 2 }
-                    theme.numberOfPairs = stepperValue
-                }
+        Stepper("Number of pairs: \(theme.numberOfPairs)", value: $theme.numberOfPairs, in: 2...($theme.emojis.count <= 2 ? 2 : $theme.emojis.count), step: 1)
     }
     
     var colorPicker: some View {
